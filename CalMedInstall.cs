@@ -41,14 +41,25 @@ namespace CalMedUpdater
             return path.ToString();
         }
 
+        private void KillXerex()
+        {
+            try
+            {
+                Process[] processes = Process.GetProcesses();
+
+                foreach (Process process in processes)
+                {
+                    if (process.ProcessName.ToLowerInvariant().Contains("xerex"))
+                        process.Kill();
+                }
+            } catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+
         public override void PerformPostInstall(string installPath)
         {
-            // Copy Xerex to startup
-            string xerexFile = Path.Combine(getAllUsersStartMenu(), @"Programs\Startup\XerexServer.exe");
-            if (File.Exists(xerexFile)) { File.Delete(xerexFile); }
-            File.Copy(Path.Combine(installPath, @"installation_files\XerexServer.exe"), xerexFile);
-            Console.WriteLine("Xerex Copied");
-
             // Register Midas
             string midasFile = Path.Combine(getSystem32Directory(), "midas.dll");
             if (File.Exists(midasFile)) {
@@ -68,6 +79,18 @@ namespace CalMedUpdater
             Process regeditProcess = Process.Start("regedit.exe", String.Format("/s {0}", XerexRegistry));
             regeditProcess.WaitForExit();
             Console.WriteLine("Xerex Registry Imported");
+
+            // Kill Xerex
+            KillXerex();
+
+            // Copy Xerex to startup
+            string xerexFile = Path.Combine(getAllUsersStartMenu(), @"Programs\Startup\XerexServer.exe");
+            if (File.Exists(xerexFile)) { File.Delete(xerexFile); }
+            File.Copy(Path.Combine(installPath, @"installation_files\XerexServer.exe"), xerexFile);
+            Console.WriteLine("Xerex Copied");
+
+            // Start Xerex
+            Process.Start(xerexFile);
 
             /*
             Process xerex = new Process();
