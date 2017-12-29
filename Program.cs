@@ -79,15 +79,16 @@ namespace CalMedUpdater
             }
 
             string sha1 = GetSha1(installPath);
+            Console.WriteLine("SHA1: {0}", sha1 != null ? sha1 : "Not Installed");
             bool found = sha1 == null;
 
             for (int i = 0; i < installs.Count; i++)
             {
-                CalMedInstall install = installs[0];
+                CalMedInstall install = installs[i];
 
                 if (found)
                 {
-                    Console.WriteLine("Starting Install {0}", install.FilePath);
+                    Console.WriteLine("Starting Install {0} {1}", install.FilePath, install.Is64 ? "64bit" : "32bit");
                     install.PerformInstall(installPath);
                     Console.WriteLine("Installation Finished");
                     Console.WriteLine("Starting Post Install");

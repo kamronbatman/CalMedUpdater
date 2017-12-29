@@ -50,7 +50,10 @@ namespace CalMedUpdater
                 foreach (Process process in processes)
                 {
                     if (process.ProcessName.ToLowerInvariant().Contains("xerex"))
+                    {
                         process.Kill();
+                        process.WaitForExit();
+                    }
                 }
             } catch (Exception e)
             {
