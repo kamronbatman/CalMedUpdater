@@ -1,6 +1,6 @@
-﻿using System;
+﻿using IWshRuntimeLibrary;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -20,6 +20,8 @@ namespace CalMedUpdater
         extern static IntPtr GetModuleHandle(string moduleName);
         [DllImport("kernel32.dll", CharSet = CharSet.Ansi, SetLastError = true)]
         extern static IntPtr GetProcAddress(IntPtr hModule, string methodName);
+        [DllImport("shell32.dll")]
+        static extern bool SHGetSpecialFolderPath(IntPtr hwndOwner, [Out] StringBuilder lpszPath, int nFolder, bool fCreate);
 
         private static bool ModuleContainsFunction(string moduleName, string methodName)
         {
@@ -37,7 +39,7 @@ namespace CalMedUpdater
 
         public static void Main(string[] args)
         {
-            if (!File.Exists(args[0]))
+            if (!System.IO.File.Exists(args[0]))
             {
                 Console.WriteLine("Failed to open: {0}", args[0]);
                 return;
@@ -96,24 +98,54 @@ namespace CalMedUpdater
 
                 Console.WriteLine("Copied ItemizedSts");
             }
+
+            XmlNode shortcutNode = doc["DesktopShortcut"];
+            if (shortcutNode != null)
+            {
+                CreateDesktopShortcut(installPath, new DesktopShortcut() { Name = shortcutNode["Name"].InnerText, Arguments = shortcutNode["Arguments"].InnerText });
+            }
         }
+        private static string getAllUsersDesktopDirectory()
+        {
+            StringBuilder path = new StringBuilder(260);
+            SHGetSpecialFolderPath(IntPtr.Zero, path, 0x19, false);
+            return path.ToString();
+        }
+        private static void CreateDesktopShortcut(string installPath, DesktopShortcut desktopShortcut)
+        {
+            string shortcutPath = Path.Combine(getAllUsersDesktopDirectory(), String.Format("{0}.lnk", desktopShortcut.Name));
+            string mainFilePath = Path.Combine(installPath, "maincds.exe");
+
+            if (System.IO.File.Exists(shortcutPath))
+                System.IO.File.Delete(shortcutPath);
+            
+            WshShell shell = new WshShell();
+            IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutPath);
+            shortcut.Description = desktopShortcut.Name;
+            shortcut.WorkingDirectory = installPath;
+            shortcut.TargetPath = mainFilePath;
+            shortcut.Arguments = desktopShortcut.Arguments;
+            shortcut.IconLocation = mainFilePath;
+            shortcut.Save();
+        }
+
         private static void CopyItemizedSt(ItemizedSt item, string installPath)
         {
             string dest = Path.Combine(Path.Combine(installPath, @"rpt\ItemizedSt"), item.File);
-            if (File.Exists(dest)) { File.Delete(dest); }
+            if (System.IO.File.Exists(dest)) { System.IO.File.Delete(dest); }
 
-            File.Copy(Path.Combine(item.Source, item.File), dest);
+            System.IO.File.Copy(Path.Combine(item.Source, item.File), dest);
         }
 
         public static string GetSha1(string installPath)
         {
             string path = Path.Combine(installPath, "maincds.exe");
 
-            if (!File.Exists(path)) { return null; }
+            if (!System.IO.File.Exists(path)) { return null; }
 
             using (var sha1 = SHA1.Create())
             {
-                using (var stream = File.OpenRead(path))
+                using (var stream = System.IO.File.OpenRead(path))
                 {
                     return BitConverter.ToString(sha1.ComputeHash(stream)).Replace("-", "").ToLowerInvariant();
                 }

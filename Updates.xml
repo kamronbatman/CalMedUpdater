@@ -12,6 +12,10 @@
     <Source>\\BMDPDC1\Software\Calmed\</Source>
   </ItemizedSt>
 </ItemizedSts>
+<DesktopShortcut>
+  <Name>Practice Expert</Name>
+  <Arguments>localhost, burstein</Arguments>
+</DesktopShortcut>
 <Installs>
   <CalMedInstall>
     <SHA1>f30c55e55aa35ccef368dbf071072a17403b3700</SHA1>
