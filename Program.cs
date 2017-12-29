@@ -50,8 +50,19 @@ namespace CalMedUpdater
 
             string installPath = is64Win ? doc["InstallPath"]["x64"].InnerText : doc["InstallPath"]["x86"].InnerText;
 
-            XmlNode installNodes = doc["Installs"];
+            List<ItemizedSt> itemizedSts = new List<ItemizedSt>();
 
+            XmlNode itemizedStsNode = doc["ItemizedSts"];
+
+            if (itemizedStsNode != null)
+            {
+                foreach (XmlNode itemizedStNode in itemizedStsNode.ChildNodes)
+                {
+                    itemizedSts.Add(new ItemizedSt() { File = itemizedStNode["File"].InnerText, Source = itemizedStNode["Source"].InnerText });
+                }
+            }
+
+            XmlNode installNodes = doc["Installs"];
             List<CalMedInstall> installs = new List<CalMedInstall>();
 
             foreach( XmlNode node in installNodes.ChildNodes)
@@ -77,6 +88,21 @@ namespace CalMedUpdater
                 else if (install.Sha1 == sha1)
                     found = true;
             }
+
+            if (itemizedSts.Count > 0)
+            {
+                foreach (ItemizedSt item in itemizedSts)
+                    CopyItemizedSt(item, installPath);
+
+                Console.WriteLine("Copied ItemizedSts");
+            }
+        }
+        private static void CopyItemizedSt(ItemizedSt item, string installPath)
+        {
+            string dest = Path.Combine(Path.Combine(installPath, @"rpt\ItemizedSt"), item.File);
+            if (File.Exists(dest)) { File.Delete(dest); }
+
+            File.Copy(Path.Combine(item.Source, item.File), dest);
         }
 
         public static string GetSha1(string installPath)
@@ -112,16 +138,6 @@ namespace CalMedUpdater
                 Is64 = Boolean.Parse(node["Is64"].InnerText),
                 XerexRegistry = node["XerexRegistry"].InnerText,
             };
-
-            XmlNode itemizedSts = node["ItemizedSts"];
-
-            if (itemizedSts != null)
-            {
-                foreach(XmlNode itemizedStNode in itemizedSts.ChildNodes)
-                {
-                    install.ItemizedSts.Add(new ItemizedSt() { File = itemizedStNode["File"].InnerText, Source = itemizedStNode["Source"].InnerText });
-                }
-            }
 
             return install;
         }

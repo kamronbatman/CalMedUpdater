@@ -27,8 +27,6 @@ namespace CalMedUpdater
         }
         public override bool Is64 { get; set; }
 
-        public List<ItemizedSt> ItemizedSts { get; set; } = new List<ItemizedSt>();
-
         private string getAllUsersStartMenu()
         {
             StringBuilder path = new StringBuilder(260);
@@ -41,14 +39,6 @@ namespace CalMedUpdater
             StringBuilder path = new StringBuilder(260);
             SHGetSpecialFolderPath(IntPtr.Zero, path, 0x29, false);
             return path.ToString();
-        }
-
-        private void CopyItemizedSt(ItemizedSt item, string installPath)
-        {
-            string dest = Path.Combine(Path.Combine(installPath, @"rpt\ItemizedSt"), item.File);
-            if (File.Exists(dest)) { File.Delete(dest); }
-
-            File.Copy(Path.Combine(item.Source, item.File), dest);
         }
 
         public override void PerformPostInstall(string installPath)
@@ -78,14 +68,6 @@ namespace CalMedUpdater
             Process regeditProcess = Process.Start("regedit.exe", String.Format("/s {0}", XerexRegistry));
             regeditProcess.WaitForExit();
             Console.WriteLine("Xerex Registry Imported");
-
-            if (ItemizedSts.Count > 0)
-            {
-                foreach (ItemizedSt item in ItemizedSts)
-                    CopyItemizedSt(item, installPath);
-
-                Console.WriteLine("Copied ItemizedSts");
-            }
 
             /*
             Process xerex = new Process();
