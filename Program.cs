@@ -50,11 +50,15 @@ namespace CalMedUpdater
             XmlDocument doc = new XmlDocument();
             doc.Load(args[0]);
 
-            string installPath = is64Win ? doc["InstallPath"]["x64"].InnerText : doc["InstallPath"]["x86"].InnerText;
+            XmlNode root = doc["CalMedUpdater"];
+
+            if (root == null) { Console.WriteLine("Cannot find CalMedUpdater root node in XML configuration."); return; }
+
+            string installPath = is64Win ? root["InstallPath"]["x64"].InnerText : root["InstallPath"]["x86"].InnerText;
 
             List<ItemizedSt> itemizedSts = new List<ItemizedSt>();
 
-            XmlNode itemizedStsNode = doc["ItemizedSts"];
+            XmlNode itemizedStsNode = root["ItemizedSts"];
 
             if (itemizedStsNode != null)
             {
@@ -64,7 +68,7 @@ namespace CalMedUpdater
                 }
             }
 
-            XmlNode installNodes = doc["Installs"];
+            XmlNode installNodes = root["Installs"];
             List<CalMedInstall> installs = new List<CalMedInstall>();
 
             foreach( XmlNode node in installNodes.ChildNodes)
@@ -74,8 +78,8 @@ namespace CalMedUpdater
                     installs.Add(install);
             }
 
-            bool found = false;
             string sha1 = GetSha1(installPath);
+            bool found = sha1 == null;
 
             for (int i = 0; i < installs.Count; i++)
             {
@@ -83,9 +87,12 @@ namespace CalMedUpdater
 
                 if (found)
                 {
-                    Console.WriteLine("Starting Install {0} {1}", install.FilePath);
+                    Console.WriteLine("Starting Install {0}", install.FilePath);
                     install.PerformInstall(installPath);
+                    Console.WriteLine("Installation Finished");
+                    Console.WriteLine("Starting Post Install");
                     install.PerformPostInstall(installPath);
+                    Console.WriteLine("Post Install Finished");
                 }
                 else if (install.Sha1 == sha1)
                     found = true;
@@ -99,7 +106,7 @@ namespace CalMedUpdater
                 Console.WriteLine("Copied ItemizedSts");
             }
 
-            XmlNode shortcutNode = doc["DesktopShortcut"];
+            XmlNode shortcutNode = root["DesktopShortcut"];
             if (shortcutNode != null)
             {
                 CreateDesktopShortcut(installPath, new DesktopShortcut() { Name = shortcutNode["Name"].InnerText, Arguments = shortcutNode["Arguments"].InnerText });

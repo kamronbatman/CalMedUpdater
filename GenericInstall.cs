@@ -13,10 +13,8 @@ namespace CalMedUpdater
 
         public virtual void PerformInstall(string installPath)
         {
-            Console.WriteLine("Starting Installation: {0}", FilePath);
             Process process = Process.Start(FilePath, FileArguments);
             process.WaitForExit();
-            Console.WriteLine("Installation Finished");
         }
 
         public virtual void PerformPostInstall(string installPath)
