@@ -36,6 +36,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CalMedInstall.cs" />
+    <Compile Include="GenericInstall.cs" />
+    <Compile Include="Install.cs" />
+    <Compile Include="ItemizedSt.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

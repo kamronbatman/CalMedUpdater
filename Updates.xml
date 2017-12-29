@@ -1,0 +1,58 @@
+<InstallPath>
+  <x86>C:\Program Files\calmed</x86>
+  <x64>C:\Program Files (x86)\calmed<x64>
+</InstallPath>
+<ItemizedSts>
+  <ItemizedSt>
+    <File>ITEMIZED_Burstein.RPT</File>
+    <Source>\\BMDPDC1\Software\Calmed\</Source>
+  </ItemizedSt>
+  <ItemizedSt>
+    <File>ITEMIZED_WC_BURSTEIN.rpt</File>
+    <Source>\\BMDPDC1\Software\Calmed\</Source>
+  </ItemizedSt>
+</ItemizedSts>
+<Installs>
+  <CalMedInstall>
+    <SHA1>f30c55e55aa35ccef368dbf071072a17403b3700</SHA1>
+    <ConfigPath>\\BMDPDC1\Software\Calmed\Calmed_32.inf</ConfigPath>
+    <Is64>false</Is64>
+    <XerexRegistry>\\BMDPDC1\Software\Calmed\xerex-registry_32.reg</XerexRegistry>
+    <FilePath>\\BMDPDC1\Software\Calmed\setup.exe</FilePath>
+  </CalMedInstall>
+  <CalMedInstall>
+    <SHA1>f30c55e55aa35ccef368dbf071072a17403b3700</SHA1>
+    <ConfigPath>\\BMDPDC1\Software\Calmed\Calmed_64.inf</ConfigPath>
+    <Is64>true</Is64>
+    <XerexRegistry>\\BMDPDC1\Software\Calmed\xerex-registry_64.reg</XerexRegistry>
+    <FilePath>\\BMDPDC1\Software\Calmed\setup.exe</FilePath>
+  </CalMedInstall>
+  <CalMedInstall>
+    <SHA1>528ac59eda424df61a6959df7443294f0edf299b</SHA1>
+    <ConfigPath>\\BMDPDC1\Software\Calmed\Calmedupdate_2012_32.inf</ConfigPath>
+    <Is64>false</Is64>
+    <XerexRegistry>\\BMDPDC1\Software\Calmed\xerex-registry_32.reg</XerexRegistry>
+    <FilePath>\\BMDPDC1\Software\Calmed\update_2012_100_7_1_03_09_15.exe</FilePath>
+  </CalMedInstall>
+  <CalMedInstall>
+    <SHA1>528ac59eda424df61a6959df7443294f0edf299b</SHA1>
+    <ConfigPath>\\BMDPDC1\Software\Calmed\Calmedupdate_2012_64.inf</ConfigPath>
+    <Is64>true</Is64>
+    <XerexRegistry>\\BMDPDC1\Software\Calmed\xerex-registry_64.reg</XerexRegistry>
+    <FilePath>\\BMDPDC1\Software\Calmed\update_2012_100_7_1_03_09_15.exe</FilePath>
+  </CalMedInstall>
+  <CalMedInstall>
+    <SHA1>951748651b6dda4c9568bedea92d4c624826c1fc</SHA1>
+    <ConfigPath>\\BMDPDC1\Software\Calmed\Calmedupdate_2015_32.inf</ConfigPath>
+    <Is64>false</Is64>
+    <XerexRegistry>\\BMDPDC1\Software\Calmed\xerex-registry_32.reg</XerexRegistry>
+    <FilePath>\\BMDPDC1\Software\Calmed\update_2015_100_7_1.exe</FilePath>
+  </CalMedInstall>
+  <CalMedInstall>
+    <SHA1>951748651b6dda4c9568bedea92d4c624826c1fc</SHA1>
+    <ConfigPath>\\BMDPDC1\Software\Calmed\Calmedupdate_2015_64.inf</ConfigPath>
+    <Is64>true</Is64>
+    <XerexRegistry>\\BMDPDC1\Software\Calmed\xerex-registry_64.reg</XerexRegistry>
+    <FilePath>\\BMDPDC1\Software\Calmed\update_2015_100_7_1.exe</FilePath>
+  </CalMedInstall>
+</Installs>
