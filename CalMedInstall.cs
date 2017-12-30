@@ -94,6 +94,7 @@ namespace CalMedUpdater
 
             // Start Xerex
             Process.Start(xerexFile);
+            Console.WriteLine("Xerex Started");
 
             /*
             Process xerex = new Process();
