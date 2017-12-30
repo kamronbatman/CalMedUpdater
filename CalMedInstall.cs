@@ -5,6 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Xml;
 
 namespace CalMedUpdater
 {
@@ -13,9 +14,9 @@ namespace CalMedUpdater
         [DllImport("shell32.dll")]
         static extern bool SHGetSpecialFolderPath(IntPtr hwndOwner, [Out] StringBuilder lpszPath, int nFolder, bool fCreate);
 
-        public string ConfigPath { get; set; }
+        public SplitPath ConfigPath { get; set; }
         public string Sha1 { get; set; }
-        public string XerexRegistry { get; set; }
+        public SplitPath XerexRegistry { get; set; }
         public override string FilePath { get; set; }
         public override string FileArguments {
             get
@@ -25,7 +26,14 @@ namespace CalMedUpdater
 
             set { }
         }
-        public override bool Is64 { get; set; }
+
+        public CalMedInstall(XmlNode node)
+        {
+            ConfigPath = new SplitPath(node["Config"]);
+            XerexRegistry = new SplitPath(node["XerexRegistry"]);
+            Sha1 = node["SHA1"]?.InnerText;
+            FilePath = node["FilePath"].InnerText;
+        }
 
         private string getAllUsersStartMenu()
         {

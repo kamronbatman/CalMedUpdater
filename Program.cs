@@ -11,31 +11,8 @@ namespace CalMedUpdater
 {
     public class MainProgram
     {
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        extern static bool IsWow64Process(IntPtr hProcess, [MarshalAs(UnmanagedType.Bool)] out bool isWow64);
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        extern static IntPtr GetCurrentProcess();
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-        extern static IntPtr GetModuleHandle(string moduleName);
-        [DllImport("kernel32.dll", CharSet = CharSet.Ansi, SetLastError = true)]
-        extern static IntPtr GetProcAddress(IntPtr hModule, string methodName);
         [DllImport("shell32.dll")]
         static extern bool SHGetSpecialFolderPath(IntPtr hwndOwner, [Out] StringBuilder lpszPath, int nFolder, bool fCreate);
-
-        private static bool ModuleContainsFunction(string moduleName, string methodName)
-        {
-            IntPtr hModule = GetModuleHandle(moduleName);
-            if (hModule != IntPtr.Zero)
-                return GetProcAddress(hModule, methodName) != IntPtr.Zero;
-            return false;
-        }
-
-        private static bool Is64Win()
-        {
-            bool isWow64;
-            return IntPtr.Size == 8 || (ModuleContainsFunction("kernel32.dll", "IsWow64Process") && IsWow64Process(GetCurrentProcess(), out isWow64) && isWow64);
-        }
 
         public static void Main(string[] args)
         {
@@ -45,7 +22,7 @@ namespace CalMedUpdater
                 return;
             }
 
-            bool is64Win = Is64Win();
+            bool is64Win = Utility.Is64Win();
 
             XmlDocument doc = new XmlDocument();
             doc.Load(args[0]);
@@ -77,45 +54,15 @@ namespace CalMedUpdater
                 }
             }
 
-            XmlNode installNodes = root["Installs"];
-            List<CalMedInstall> installs = new List<CalMedInstall>();
-
-            foreach( XmlNode node in installNodes.ChildNodes)
-            {
-                CalMedInstall install = CreateCalMedInstall(node);
-                if (install.Is64 == is64Win)
-                    installs.Add(install);
-            }
-
             string sha1 = GetSha1(installPath);
-            Console.WriteLine("SHA1: {0}", sha1 != null ? sha1 : "Not Installed");
-            int installIndex = -1;
+            Console.WriteLine("SHA1: {0}", sha1 ?? "Not Installed");
 
-            if (sha1 != null)
-            {
-                for (int i = 0; i < installs.Count; i++)
-                {
-                    CalMedInstall install = installs[i];
+            if (sha1 == null)
+                Install(new CalMedInstall(root["CalMedInstall"]), installPath);
 
-                    if (install.Sha1 == sha1)
-                    {
-                        installIndex = i;
-                        break;
-                    }
-                }
-            }
-
-            for (int i = installIndex + 1; i < installs.Count; i++)
-            {
-                CalMedInstall install = installs[i];
-
-                Console.WriteLine("Starting Install {0} {1}", install.FilePath, install.Is64 ? "64bit" : "32bit");
-                install.PerformInstall(installPath);
-                Console.WriteLine("Installation Finished");
-                Console.WriteLine("Starting Post Install");
-                install.PerformPostInstall(installPath);
-                Console.WriteLine("Post Install Finished");
-            }
+            CalMedInstall update = new CalMedInstall(root["CalMedUpdate"]);
+            if (update.Sha1 != sha1)
+                Install(update, installPath);
 
             if (itemizedSts.Count > 0)
             {
@@ -128,6 +75,17 @@ namespace CalMedUpdater
             if (desktopShortcut != null)
                 CreateDesktopShortcut(installPath, desktopShortcut);
         }
+
+        private static void Install(CalMedInstall install, string installPath)
+        {
+            Console.WriteLine("Starting Install {0}", install.FilePath);
+            install.PerformInstall(installPath);
+            Console.WriteLine("Installation Finished");
+            Console.WriteLine("Starting Post Install");
+            install.PerformPostInstall(installPath);
+            Console.WriteLine("Post Install Finished");
+        }
+
         private static string getAllUsersDesktopDirectory()
         {
             StringBuilder path = new StringBuilder(260);
@@ -180,28 +138,6 @@ namespace CalMedUpdater
                     return BitConverter.ToString(sha1.ComputeHash(stream)).Replace("-", "").ToLowerInvariant();
                 }
             }
-        }
-
-        public static GenericInstall CreateGenericInstall(XmlNode node)
-        {
-            return new GenericInstall() {
-                FilePath = node["FilePath"].InnerText,
-                FileArguments = node["FileArguments"].InnerText
-            };
-        }
-
-        public static CalMedInstall CreateCalMedInstall(XmlNode node)
-        {
-            CalMedInstall install = new CalMedInstall()
-            {
-                FilePath = node["FilePath"].InnerText,
-                ConfigPath = node["ConfigPath"].InnerText,
-                Sha1 = node["SHA1"].InnerText,
-                Is64 = Boolean.Parse(node["Is64"].InnerText),
-                XerexRegistry = node["XerexRegistry"].InnerText,
-            };
-
-            return install;
         }
     }
 }

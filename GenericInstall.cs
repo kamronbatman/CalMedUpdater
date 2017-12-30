@@ -9,7 +9,6 @@ namespace CalMedUpdater
     {
         public virtual string FilePath { get; set; }
         public virtual string FileArguments { get; set; }
-        public virtual bool Is64 { get; set; }
 
         public virtual void PerformInstall(string installPath)
         {

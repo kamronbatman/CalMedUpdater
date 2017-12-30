@@ -10,7 +10,6 @@ namespace CalMedUpdater
     {
         string FilePath { get; }
         string FileArguments { get; }
-        bool Is64 { get; }
 
         void PerformInstall(string installPath);
         void PerformPostInstall(string installPath);
