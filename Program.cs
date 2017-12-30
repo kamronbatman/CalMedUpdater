@@ -56,6 +56,15 @@ namespace CalMedUpdater
 
             string installPath = is64Win ? root["InstallPath"]["x64"].InnerText : root["InstallPath"]["x86"].InnerText;
 
+            XmlNode shortcutNode = root["DesktopShortcut"];
+            DesktopShortcut desktopShortcut = null;
+
+            if (shortcutNode != null)
+                desktopShortcut = new DesktopShortcut() { Name = shortcutNode["Name"].InnerText, Arguments = shortcutNode["Arguments"].InnerText };
+
+            if (desktopShortcut != null)
+                DeleteDesktopShortcut(installPath, desktopShortcut);
+
             List<ItemizedSt> itemizedSts = new List<ItemizedSt>();
 
             XmlNode itemizedStsNode = root["ItemizedSts"];
@@ -116,11 +125,8 @@ namespace CalMedUpdater
                 Console.WriteLine("Copied ItemizedSts");
             }
 
-            XmlNode shortcutNode = root["DesktopShortcut"];
-            if (shortcutNode != null)
-            {
-                CreateDesktopShortcut(installPath, new DesktopShortcut() { Name = shortcutNode["Name"].InnerText, Arguments = shortcutNode["Arguments"].InnerText });
-            }
+            if (desktopShortcut != null)
+                CreateDesktopShortcut(installPath, desktopShortcut);
         }
         private static string getAllUsersDesktopDirectory()
         {
@@ -128,14 +134,21 @@ namespace CalMedUpdater
             SHGetSpecialFolderPath(IntPtr.Zero, path, 0x19, false);
             return path.ToString();
         }
+
+        private static void DeleteDesktopShortcut(string installPath, DesktopShortcut desktopShortcut)
+        {
+            string shortcutPath = Path.Combine(getAllUsersDesktopDirectory(), String.Format("{0}.lnk", desktopShortcut.Name));
+
+            if (System.IO.File.Exists(shortcutPath)) { System.IO.File.Delete(shortcutPath); }
+        }
+
         private static void CreateDesktopShortcut(string installPath, DesktopShortcut desktopShortcut)
         {
+            DeleteDesktopShortcut(installPath, desktopShortcut);
+
             string shortcutPath = Path.Combine(getAllUsersDesktopDirectory(), String.Format("{0}.lnk", desktopShortcut.Name));
             string mainFilePath = Path.Combine(installPath, "maincds.exe");
 
-            if (System.IO.File.Exists(shortcutPath))
-                System.IO.File.Delete(shortcutPath);
-            
             WshShell shell = new WshShell();
             IWshShortcut shortcut = shell.CreateShortcut(shortcutPath) as IWshShortcut;
             shortcut.Description = desktopShortcut.Name;
