@@ -128,7 +128,7 @@ namespace CalMedUpdater
                 System.IO.File.Delete(shortcutPath);
             
             WshShell shell = new WshShell();
-            IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutPath);
+            IWshShortcut shortcut = shell.CreateShortcut(shortcutPath) as IWshShortcut;
             shortcut.Description = desktopShortcut.Name;
             shortcut.WorkingDirectory = installPath;
             shortcut.TargetPath = mainFilePath;
