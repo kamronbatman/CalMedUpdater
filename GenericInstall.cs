@@ -7,7 +7,7 @@ namespace CalMedUpdater
 {
     public class GenericInstall : Install
     {
-        public virtual string FilePath { get; set; }
+        public virtual SplitPath FilePath { get; set; }
         public virtual string FileArguments { get; set; }
 
         public virtual void PerformInstall(string installPath)

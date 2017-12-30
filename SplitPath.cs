@@ -11,13 +11,27 @@ namespace CalMedUpdater
     {
         public string Path { get; set; }
 
-        public SplitPath(string x86, string x64)
+        public SplitPath(string path)
         {
-            Path = Utility.Is64Win() ? x64 : x86;
+            Path = path;
         }
 
-        public SplitPath(XmlNode node) : this(node?["x86"].InnerText, node?["x64"].InnerText)
+        public SplitPath(string x86, string x64) : this(Utility.Is64Win() ? x64 : x86)
         {
+        }
+
+        public SplitPath(XmlNode node) : this(node?["x86"]?.InnerText ?? node?.InnerText, node?["x64"]?.InnerText ?? node?.InnerText)
+        {
+        }
+
+        public static implicit operator String(SplitPath path)
+        {
+            return path.Path;
+        }
+
+        public static implicit operator SplitPath(string path)
+        {
+            return new SplitPath(path);
         }
 
         public override string ToString()

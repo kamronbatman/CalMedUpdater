@@ -8,7 +8,7 @@ namespace CalMedUpdater
 {
     public interface Install
     {
-        string FilePath { get; }
+        SplitPath FilePath { get; }
         string FileArguments { get; }
 
         void PerformInstall(string installPath);

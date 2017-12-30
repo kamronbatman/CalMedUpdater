@@ -17,7 +17,7 @@ namespace CalMedUpdater
         public SplitPath ConfigPath { get; set; }
         public string Sha1 { get; set; }
         public SplitPath XerexRegistry { get; set; }
-        public override string FilePath { get; set; }
+        public override SplitPath FilePath { get; set; }
         public override string FileArguments {
             get
             {
@@ -32,7 +32,7 @@ namespace CalMedUpdater
             ConfigPath = new SplitPath(node["Config"]);
             XerexRegistry = new SplitPath(node["XerexRegistry"]);
             Sha1 = node["SHA1"]?.InnerText;
-            FilePath = node["FilePath"].InnerText;
+            FilePath = new SplitPath(node["FilePath"]);
         }
 
         private string getAllUsersStartMenu()

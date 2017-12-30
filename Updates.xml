@@ -24,7 +24,7 @@
     </Config>
     <XerexRegistry>
       <x86>\\BMDPDC1\Software\Calmed\xerex-registry_32.reg</x86>
-      <x86>\\BMDPDC1\Software\Calmed\xerex-registry_64.reg</x86>
+      <x64>\\BMDPDC1\Software\Calmed\xerex-registry_64.reg</x64>
     </XerexRegistry>
     <FilePath>\\BMDPDC1\Software\Calmed\setup.exe</FilePath>
   </CalMedInstall>
@@ -36,8 +36,8 @@
     </Config>
     <XerexRegistry>
       <x86>\\BMDPDC1\Software\Calmed\xerex-registry_32.reg</x86>
-      <x86>\\BMDPDC1\Software\Calmed\xerex-registry_64.reg</x86>
+      <x64>\\BMDPDC1\Software\Calmed\xerex-registry_64.reg</x64>
     </XerexRegistry>
-    <FilePath>\\BMDPDC1\Software\Calmed\update_2015_100_7_1.exe</FilePath>
+    <FilePath>\\BMDPDC1\Software\Calmed\update.exe</FilePath>
   </CalMedUpdate>
 </CalMedUpdater>
