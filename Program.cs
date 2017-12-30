@@ -73,7 +73,10 @@ namespace CalMedUpdater
             }
 
             if (desktopShortcut != null)
+            {
                 CreateDesktopShortcut(installPath, desktopShortcut);
+                Console.WriteLine("Created shortcut");
+            }
         }
 
         private static void Install(CalMedInstall install, string installPath)
