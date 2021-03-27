@@ -1,43 +1,43 @@
 <CalMedUpdater>
-  <InstallPath>
-    <x86>C:\Program Files\calmed</x86>
-    <x64>C:\Program Files (x86)\calmed</x64>
-  </InstallPath>
-  <ItemizedSts>
-    <ItemizedSt>
-      <File>ITEMIZED_Burstein.RPT</File>
-      <Source>\\BMDPDC1\Software\Calmed\</Source>
-    </ItemizedSt>
-    <ItemizedSt>
-      <File>ITEMIZED_WC_BURSTEIN.rpt</File>
-      <Source>\\BMDPDC1\Software\Calmed\</Source>
-    </ItemizedSt>
-  </ItemizedSts>
-  <DesktopShortcut>
-    <Name>Practice Expert</Name>
-    <Arguments>localhost, burstein</Arguments>
-  </DesktopShortcut>
-  <CalMedInstall>
-    <Config>
-      <x86>\\BMDPDC1\Software\Calmed\Calmed_32.inf</x86>
-      <x64>\\BMDPDC1\Software\Calmed\Calmed_64.inf</x64>
-    </Config>
-    <XerexRegistry>
-      <x86>\\BMDPDC1\Software\Calmed\xerex-registry_32.reg</x86>
-      <x64>\\BMDPDC1\Software\Calmed\xerex-registry_64.reg</x64>
-    </XerexRegistry>
-    <FilePath>\\BMDPDC1\Software\Calmed\setup.exe</FilePath>
-  </CalMedInstall>
-  <CalMedUpdate>
-    <SHA1>951748651b6dda4c9568bedea92d4c624826c1fc</SHA1>
-    <Config>
-      <x86>\\BMDPDC1\Software\Calmed\Calmedupdate_32.inf</x86>
-      <x64>\\BMDPDC1\Software\Calmed\Calmedupdate_64.inf</x64>
-    </Config>
-    <XerexRegistry>
-      <x86>\\BMDPDC1\Software\Calmed\xerex-registry_32.reg</x86>
-      <x64>\\BMDPDC1\Software\Calmed\xerex-registry_64.reg</x64>
-    </XerexRegistry>
-    <FilePath>\\BMDPDC1\Software\Calmed\update.exe</FilePath>
-  </CalMedUpdate>
+	<InstallPath>
+		<x86>C:\Program Files\calmed</x86>
+		<x64>C:\Program Files (x86)\calmed</x64>
+	</InstallPath>
+	<Validation>
+		<FileToVerify>maincds.exe</FileToVerify>
+		<HashType>SHA256</HashType>
+		<Hash>0A15E11D97BA66F35B35AFABED6AF4EA46D9D7C0477F8F3FF07726C8AB8CC64A</Hash>
+	</Validation>
+	<CalMedInstall>
+		<FilePath>\\BMDPDC1\Software\Calmed\setup.exe</FilePath>
+		<Config>
+			<x86>\\BMDPDC1\Software\Calmed\Calmed_32.inf</x86>
+			<x64>\\BMDPDC1\Software\Calmed\Calmed_64.inf</x64>
+		</Config>
+	</CalMedInstall>a
+	<CalMedUpdate>
+		<Config>
+			<x86>\\BMDPDC1\Software\Calmed\Calmedupdate_32.inf</x86>
+			<x64>\\BMDPDC1\Software\Calmed\Calmedupdate_64.inf</x64>
+		</Config>
+		<XerexRegistry>
+			<x86>\\BMDPDC1\Software\Calmed\xerex-registry_32.reg</x86>
+			<x64>\\BMDPDC1\Software\Calmed\xerex-registry_64.reg</x64>
+		</XerexRegistry>
+		<FilePath>\\BMDPDC1\Software\Calmed\update.exe</FilePath>
+	</CalMedUpdate>
+	<ItemizedSts>
+		<ItemizedSt>
+			<File>ITEMIZED_Burstein.RPT</File>
+			<Source>\\BMDPDC1\Software\Calmed\</Source>
+		</ItemizedSt>
+		<ItemizedSt>
+			<File>ITEMIZED_WC_BURSTEIN.rpt</File>
+			<Source>\\BMDPDC1\Software\Calmed\</Source>
+		</ItemizedSt>
+	</ItemizedSts>
+	<DesktopShortcut>
+		<Name>Practice Expert</Name>
+		<Arguments>localhost, burstein</Arguments>
+	</DesktopShortcut>
 </CalMedUpdater>

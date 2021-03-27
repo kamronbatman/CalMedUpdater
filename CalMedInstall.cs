@@ -15,7 +15,6 @@ namespace CalMedUpdater
         static extern bool SHGetSpecialFolderPath(IntPtr hwndOwner, [Out] StringBuilder lpszPath, int nFolder, bool fCreate);
 
         public SplitPath ConfigPath { get; set; }
-        public string Sha1 { get; set; }
         public SplitPath XerexRegistry { get; set; }
         public override SplitPath FilePath { get; set; }
         public override string FileArguments {
@@ -31,7 +30,6 @@ namespace CalMedUpdater
         {
             ConfigPath = new SplitPath(node["Config"]);
             XerexRegistry = new SplitPath(node["XerexRegistry"]);
-            Sha1 = node["SHA1"]?.InnerText;
             FilePath = new SplitPath(node["FilePath"]);
         }
 
@@ -49,7 +47,7 @@ namespace CalMedUpdater
             return path.ToString();
         }
 
-        private void KillXerex()
+        private static void KillXerex()
         {
             try
             {
@@ -71,6 +69,14 @@ namespace CalMedUpdater
 
         public override void PerformPostInstall(string installPath)
         {
+            if (XerexRegistry.Path == null)
+            {
+                return;
+            }
+
+            // Kill Xerex
+            KillXerex();
+
             // Register Midas
             string midasFile = Path.Combine(getSystem32Directory(), "midas.dll");
             if (File.Exists(midasFile)) {
@@ -90,9 +96,6 @@ namespace CalMedUpdater
             Process regeditProcess = Process.Start("regedit.exe", String.Format("/s {0}", XerexRegistry));
             regeditProcess.WaitForExit();
             Console.WriteLine("Xerex Registry Imported");
-
-            // Kill Xerex
-            KillXerex();
 
             // Copy Xerex to startup
             string xerexFile = Path.Combine(getAllUsersStartMenu(), @"Programs\Startup\XerexServer.exe");
