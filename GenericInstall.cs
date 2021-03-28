@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
+﻿using System.Diagnostics;
 
 namespace CalMedUpdater
 {
@@ -12,8 +9,7 @@ namespace CalMedUpdater
 
         public virtual void PerformInstall(string installPath)
         {
-            Process process = Process.Start(FilePath, FileArguments);
-            process.WaitForExit();
+            Process.Start(FilePath, FileArguments)?.WaitForExit();
         }
 
         public virtual void PerformPostInstall(string installPath)

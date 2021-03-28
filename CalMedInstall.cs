@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 
@@ -11,20 +8,10 @@ namespace CalMedUpdater
 {
     public class CalMedInstall : GenericInstall
     {
-        [DllImport("shell32.dll")]
-        static extern bool SHGetSpecialFolderPath(IntPtr hwndOwner, [Out] StringBuilder lpszPath, int nFolder, bool fCreate);
-
         public SplitPath ConfigPath { get; set; }
         public SplitPath XerexRegistry { get; set; }
         public override SplitPath FilePath { get; set; }
-        public override string FileArguments {
-            get
-            {
-                return String.Format("/LOADINF={0} /VERYSILENT", ConfigPath);
-            }
-
-            set { }
-        }
+        public override string FileArguments => $"/LOADINF={ConfigPath} /VERYSILENT";
 
         public CalMedInstall(XmlNode node)
         {
@@ -33,17 +20,17 @@ namespace CalMedUpdater
             FilePath = new SplitPath(node["FilePath"]);
         }
 
-        private string getAllUsersStartMenu()
+        private string GetAllUsersStartMenu()
         {
-            StringBuilder path = new StringBuilder(260);
-            SHGetSpecialFolderPath(IntPtr.Zero, path, 0x16, false);
+            var path = new StringBuilder(260);
+            Utility.SHGetSpecialFolderPath(IntPtr.Zero, path, 0x16, false);
             return path.ToString();
         }
 
-        private string getSystem32Directory()
+        private string GetSystem32Directory()
         {
-            StringBuilder path = new StringBuilder(260);
-            SHGetSpecialFolderPath(IntPtr.Zero, path, 0x29, false);
+            var path = new StringBuilder(260);
+            Utility.SHGetSpecialFolderPath(IntPtr.Zero, path, 0x29, false);
             return path.ToString();
         }
 
@@ -51,17 +38,16 @@ namespace CalMedUpdater
         {
             try
             {
-                Process[] processes = Process.GetProcesses();
+                var processes = Process.GetProcesses();
 
-                foreach (Process process in processes)
+                foreach (var process in processes)
                 {
-                    if (process.ProcessName.ToLowerInvariant().Contains("xerex"))
-                    {
-                        process.Kill();
-                        process.WaitForExit();
-                    }
+                    if (!process.ProcessName.ToLowerInvariant().Contains("xerex")) continue;
+                    process.Kill();
+                    process.WaitForExit();
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Console.WriteLine(e);
             }
@@ -78,10 +64,10 @@ namespace CalMedUpdater
             KillXerex();
 
             // Register Midas
-            string midasFile = Path.Combine(getSystem32Directory(), "midas.dll");
-            if (File.Exists(midasFile)) {
-                Process uregsvr32 = Process.Start(Path.Combine(getSystem32Directory(), "regsvr32.exe"), "/u /s midas.dll");
-                uregsvr32.WaitForExit();
+            var midasFile = Path.Combine(GetSystem32Directory(), "midas.dll");
+            if (File.Exists(midasFile))
+            {
+                Process.Start(Path.Combine(GetSystem32Directory(), "regsvr32.exe"), "/u /s midas.dll")?.WaitForExit();
 
                 File.Delete(midasFile);
                 Console.WriteLine("Midas File Unregistered & Deleted");
@@ -89,16 +75,14 @@ namespace CalMedUpdater
 
             File.Copy(Path.Combine(installPath, @"installation_files\midas.dll"), midasFile);
 
-            Process regsvr32 = Process.Start(Path.Combine(getSystem32Directory(), "regsvr32.exe"), "/s midas.dll");
-            regsvr32.WaitForExit();
+            Process.Start(Path.Combine(GetSystem32Directory(), "regsvr32.exe"), "/s midas.dll")?.WaitForExit();
             Console.WriteLine("Midas Copied & Registered");
 
-            Process regeditProcess = Process.Start("regedit.exe", String.Format("/s {0}", XerexRegistry));
-            regeditProcess.WaitForExit();
+            Process.Start("regedit.exe", String.Format("/s {0}", XerexRegistry))?.WaitForExit();
             Console.WriteLine("Xerex Registry Imported");
 
             // Copy Xerex to startup
-            string xerexFile = Path.Combine(getAllUsersStartMenu(), @"Programs\Startup\XerexServer.exe");
+            var xerexFile = Path.Combine(GetAllUsersStartMenu(), @"Programs\Startup\XerexServer.exe");
             if (File.Exists(xerexFile)) { File.Delete(xerexFile); }
             File.Copy(Path.Combine(installPath, @"installation_files\XerexServer.exe"), xerexFile);
             Console.WriteLine("Xerex Copied");
@@ -106,13 +90,6 @@ namespace CalMedUpdater
             // Start Xerex
             Process.Start(xerexFile);
             Console.WriteLine("Xerex Started");
-
-            /*
-            Process xerex = new Process();
-            xerex.StartInfo = new ProcessStartInfo(Path.Combine(getAllUsersStartMenu(), @"Programs\Startup\XerexServer.exe"));
-            xerex.Start();
-            Console.WriteLine("Xerex Started");
-            */
         }
     }
 }

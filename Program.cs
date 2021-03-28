@@ -5,49 +5,50 @@ using File = System.IO.File;
 
 namespace CalMedUpdater
 {
-    public class MainProgram
+    public class CalMedUpdaterApp
     {
         public static void Main(string[] args)
         {
+            Console.WriteLine("Cal-Med Updater v2.2");
+            
             if (args.Length == 0)
             {
                 Console.WriteLine("No configuration file specified.");
                 return;
             }
 
-            if (!File.Exists(args[0]))
+            var updatesFile = args[0];
+
+            if (!File.Exists(updatesFile))
             {
-                Console.WriteLine("Failed to open: {0}", args[0]);
+                Console.WriteLine("Failed to open: {0}", updatesFile);
                 return;
             }
 
-            var is64Win = Utility.Is64Win();
+            var getHashMode = args.Length > 1 && args[0].ToLower() == "-hash" || args[1].ToLower() == "-hash";
 
-            XmlDocument doc = new XmlDocument();
-            doc.Load(args[0]);
+            var doc = new XmlDocument();
+            doc.Load(updatesFile);
 
             XmlNode root = doc["CalMedUpdater"];
 
             if (root == null) { Console.WriteLine("Cannot find CalMedUpdater root node in XML configuration."); return; }
 
-            var installPath = is64Win ? root["InstallPath"]["x64"].InnerText : root["InstallPath"]["x86"].InnerText;
+            var installPath = new SplitPath(root["InstallPath"]);
 
             var validationNode = root["Validation"];
-            if (validationNode != null)
+            if (!getHashMode && validationNode != null)
             {
-                var fileNameToVerify = validationNode["FileToVerify"].InnerText;
-                var fileToVerify = Path.Combine(installPath, fileNameToVerify);
-                var hashType = (HashType)Enum.Parse(typeof(HashType), validationNode["HashType"].InnerText);
-                var hashToCheck = validationNode["Hash"].InnerText.ToUpper();
+                var fileNameToVerifyNode = validationNode["FileToVerify"];
+                var fileToVerify = Path.Combine(installPath, fileNameToVerifyNode!.InnerText);
+                var hashTypeNode = validationNode["HashType"];
+                var hashType = Enum.Parse<HashType>(hashTypeNode!.InnerText);
+                var hashNode = validationNode["Hash"];
+                var hashToCheck = hashNode!.InnerText.ToUpper();
 
                 if (File.Exists(fileToVerify))
                 {
                     var hashFound = Hashing.HashFile(hashType, new FileInfo(fileToVerify)).ToUpper();
-                    if (args.Length > 1 && args[0].ToLower() == "-hash" || args[1].ToLower() == "-hash")
-                    {
-                        Console.WriteLine("Hash ({2}) for {0} is {1}", fileNameToVerify, hashFound, hashType.ToString());
-                        return;
-                    }
 
                     if (hashFound == hashToCheck)
                     {
@@ -58,7 +59,11 @@ namespace CalMedUpdater
             }
 
             XmlNode shortcutNode = root["DesktopShortcut"];
-            var desktopShortcut = new DesktopShortcut() { Name = shortcutNode["Name"].InnerText, Arguments = shortcutNode["Arguments"].InnerText };
+            DesktopShortcut desktopShortcut = new()
+            {
+                Name = shortcutNode["Name"]!.InnerText,
+                Arguments = shortcutNode["Arguments"]!.InnerText
+            };
 
             WindowsShortcuts.DeleteDesktopShortcut(desktopShortcut);
 
@@ -87,9 +92,62 @@ namespace CalMedUpdater
 
             WindowsShortcuts.CreateDesktopShortcut(installPath, "maincds.exe", desktopShortcut);
             Console.WriteLine("Created shortcut");
+
+            if (getHashMode)
+            {
+                if (validationNode == null)
+                {
+                    validationNode = doc.CreateElement("Validation");
+                    root.AppendChild(validationNode);
+                }
+
+                var fileNameToVerifyNode = validationNode["FileToVerify"];
+                if (fileNameToVerifyNode == null)
+                {
+                    fileNameToVerifyNode = doc.CreateElement("FileToVerify");
+                    validationNode.AppendChild(fileNameToVerifyNode);
+                }
+
+                if (string.IsNullOrWhiteSpace(fileNameToVerifyNode.InnerText))
+                {
+                    fileNameToVerifyNode.InnerText ??= "maincds.exe";
+                }
+
+                var fileToVerify = fileNameToVerifyNode.InnerText;
+
+                var hashTypeNode = validationNode["HashType"];
+                if (hashTypeNode == null)
+                {
+                    hashTypeNode = doc.CreateElement("HashType");
+                    validationNode.AppendChild(hashTypeNode);
+                }
+
+                HashType hashType;
+                try
+                {
+                    hashType = Enum.Parse<HashType>(hashTypeNode.InnerText);
+                }
+                catch
+                {
+                    hashType = HashType.SHA256;
+                    hashTypeNode.InnerText = hashType.ToString();
+                }
+
+                var hashNode = validationNode["Hash"];
+                if (hashNode == null)
+                {
+                    hashNode = doc.CreateElement("Hash");
+                    validationNode.AppendChild(hashNode);
+                }
+
+                var hash = hashNode.InnerText = Hashing.HashFile(hashType, new FileInfo(Path.Combine(installPath, fileToVerify)));
+
+                Console.WriteLine("Updating hash for {0} in {1} to {2} ({3})", fileToVerify, updatesFile, hash, hashType.ToString());
+                doc.Save(updatesFile);
+            }
         }
 
-        private static void Install(CalMedInstall install, string installPath)
+        private static void Install(Install install, string installPath)
         {
             Console.WriteLine("Starting Install {0}", install.FilePath);
             install.PerformInstall(installPath);

@@ -9,7 +9,7 @@ namespace CalMedUpdater
 
         public SplitPath(string path) => Path = path;
 
-        public SplitPath(string x86, string x64) : this(Utility.Is64Win() ? x64 : x86)
+        public SplitPath(string x86, string x64) : this(Utility.Is64Win ? x64 : x86)
         {
         }
 

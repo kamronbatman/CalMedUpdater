@@ -6,13 +6,11 @@ namespace CalMedUpdater
     {
         public static string HashFile(HashType hashType, FileInfo fi)
         {
-            switch (hashType)
+            return hashType switch
             {
-                case HashType.SHA256:
-                    return SHA256Hashing.GetFileHash(fi);
-            }
-
-            return null;
+                HashType.SHA256 => SHA256Hashing.GetFileHash(fi),
+                _ => null
+            };
         }
     }
 }

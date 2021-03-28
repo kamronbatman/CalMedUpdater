@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CalMedUpdater
+﻿namespace CalMedUpdater
 {
     public enum HashType
     {
         None,
-        MeowHash,
-        SHA256,
-        xxHash
+        SHA256
     }
 }
