@@ -10,7 +10,7 @@ namespace CalMedUpdater
         public static void Main(string[] args)
         {
             Console.WriteLine("Cal-Med Updater v2.2");
-            
+
             if (args.Length == 0)
             {
                 Console.WriteLine("No configuration file specified.");
@@ -25,7 +25,7 @@ namespace CalMedUpdater
                 return;
             }
 
-            var getHashMode = args.Length > 1 && args[0].ToLower() == "-hash" || args[1].ToLower() == "-hash";
+            var getHashMode = args.Length > 0 && args[0].ToLower() == "-hash" || args.Length > 1 && args[1].ToLower() == "-hash";
 
             var doc = new XmlDocument();
             doc.Load(updatesFile);
